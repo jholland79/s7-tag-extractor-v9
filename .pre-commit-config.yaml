@@ -1,0 +1,154 @@
+# prek (pre-commit) configuration
+# Install: just hooks-install
+# Run manually: just hooks-run
+#
+# TIERED QUALITY GATES:
+#
+# ON COMMIT (strict, blocking):
+#   - ruff (lint + format)
+#   - ty (type check)
+#   - taplo (TOML formatting)
+#   - yamllint (YAML lint)
+#   - markdownlint (markdown lint)
+#   - pre-commit-hooks (trailing whitespace, EOF, etc.)
+#   - conventional-commit (commit message validation)
+#
+# ON PUSH (strict, blocking):
+#   - pytest (all tests must pass)
+#   - block-push-to-main (enforce PR workflow)
+#
+# ADVISORY (non-blocking, run via `just check-all`):
+#   - Additional static analysis
+#
+# SOURCERY (blocking when SOURCERY_TOKEN set):
+#   - sourcery (AI code review)
+#
+# Run `just check-all` before committing to get full feedback including advisory tools.
+
+default_install_hook_types:
+  - pre-commit
+  - pre-push
+  - commit-msg
+
+repos:
+  # ===========================================================================
+  # Python: Ruff linting and formatting (pre-commit)
+  # ===========================================================================
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.0
+    hooks:
+      - id: ruff
+        name: ruff lint
+        args: [--fix, --exit-non-zero-on-fix]
+        types_or: [python, pyi]
+      - id: ruff-format
+        name: ruff format
+        types_or: [python, pyi]
+
+  # ===========================================================================
+  # TOML: Taplo formatting (pre-commit)
+  # ===========================================================================
+  - repo: https://github.com/ComPWA/mirrors-taplo
+    rev: v0.9.3
+    hooks:
+      - id: taplo-format
+        name: taplo format
+
+  # ===========================================================================
+  # YAML: yamllint (pre-commit)
+  # ===========================================================================
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        name: yamllint
+        args: [-c, .yamllint.yaml]
+
+  # ===========================================================================
+  # Markdown: markdownlint (pre-commit)
+  # ===========================================================================
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.43.0
+    hooks:
+      - id: markdownlint
+        name: markdownlint
+        args: [--fix]
+
+  # ===========================================================================
+  # General file checks (pre-commit)
+  # ===========================================================================
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+        args: [--unsafe]
+      - id: check-toml
+      - id: check-added-large-files
+        args: [--maxkb=1000]
+      - id: check-merge-conflict
+      - id: debug-statements
+      - id: detect-private-key
+
+  # ===========================================================================
+  # Conventional commit validation (commit-msg)
+  # ===========================================================================
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.0.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args: [feat, fix, docs, style, refactor, perf, test, chore, ci, revert]
+
+  # ===========================================================================
+  # Local hooks (pre-commit and pre-push)
+  # ===========================================================================
+  - repo: local
+    hooks:
+      # Type checking with ty (pre-commit)
+      - id: ty-check
+        name: ty type check
+        entry: uvx ty check src tests
+        language: system
+        types: [python]
+        pass_filenames: false
+
+      # Block direct pushes to main branch (pre-push)
+      - id: no-push-to-main
+        name: block push to main
+        entry: .claude/hooks/block-push-to-main.sh
+        language: script
+        stages: [pre-push]
+        always_run: true
+        pass_filenames: false
+
+      # Pytest (pre-push only - slower)
+      - id: pytest
+        name: pytest
+        entry: uv run pytest --tb=short -q
+        language: system
+        types: [python]
+        pass_filenames: false
+        stages: [pre-push]
+
+      # Sourcery code review (changed files only - blocking when token set)
+      - id: sourcery-review
+        name: sourcery review
+        entry: >-
+          bash -c 'if [ -n "${SOURCERY_TOKEN:-}" ]; then
+          uvx sourcery login --token "$SOURCERY_TOKEN" >/dev/null 2>&1 &&
+          uvx sourcery review --diff "git diff --cached" --check . || exit 1;
+          else echo "SOURCERY_TOKEN not set, skipping"; fi'
+        language: system
+        types: [python]
+        pass_filenames: false
+        stages: [pre-commit]
+
+ci:
+  autofix_commit_msg: |
+    chore: auto-fix from prek hooks
+
+    [skip ci]
+  autoupdate_commit_msg: "chore: update prek hook versions"
+  skip: [pytest]  # Run separately in CI workflow

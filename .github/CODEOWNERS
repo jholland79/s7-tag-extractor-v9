@@ -1,0 +1,9 @@
+# CODEOWNERS - Require human approval for all changes
+#
+# This file ensures all PRs require review from the repository owner
+# before merging to main. Agents cannot self-approve their work.
+#
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default: all files require owner approval
+* @jholland79

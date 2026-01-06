@@ -1,0 +1,108 @@
+name: Setup Check
+
+# Runs once on first push to main, then can be manually triggered
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  check-permissions:
+    name: Verify Repository Permissions
+    runs-on: ubuntu-latest
+    # Only run on first few commits or manual trigger
+    if: github.event_name == 'workflow_dispatch' || github.run_number <= 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check PR creation permissions
+        id: pr-check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "Checking if GitHub Actions can create pull requests..."
+
+          # Try to get repo settings via API
+          RESPONSE=$(gh api repos/${{ github.repository }} --jq '.allow_merge_commit')
+
+          if [[ $? -ne 0 ]]; then
+            echo "::error::Failed to query repository API"
+            exit 1
+          fi
+
+          echo "Repository API accessible: OK"
+
+          # The actual PR creation test - create and immediately close a test branch
+          # We can't easily check the setting directly, so we document what to do
+          echo ""
+          echo "============================================"
+          echo "SETUP VERIFICATION"
+          echo "============================================"
+          echo ""
+          echo "If release-please fails with:"
+          echo "  'GitHub Actions is not permitted to create or approve pull requests'"
+          echo ""
+          echo "Fix: Go to repository Settings → Actions → General"
+          echo "     Under 'Workflow permissions', enable:"
+          echo "     ✓ 'Allow GitHub Actions to create and approve pull requests'"
+          echo ""
+          echo "Repository URL: https://github.com/${{ github.repository }}/settings/actions"
+          echo "============================================"
+
+      - name: Verify required secrets
+        env:
+          HAS_CODECOV: ${{ secrets.CODECOV_TOKEN != '' }}
+          HAS_SOURCERY: ${{ secrets.SOURCERY_TOKEN != '' }}
+        run: |
+          echo ""
+          echo "============================================"
+          echo "SECRETS CHECK"
+          echo "============================================"
+          echo ""
+
+          WARNINGS=0
+
+          if [[ "$HAS_CODECOV" != "true" ]]; then
+            echo "⚠️  CODECOV_TOKEN not set - coverage uploads will be skipped"
+            ((WARNINGS++))
+          else
+            echo "✓ CODECOV_TOKEN is set"
+          fi
+
+          if [[ "$HAS_SOURCERY" != "true" ]]; then
+            echo "⚠️  SOURCERY_TOKEN not set - Sourcery reviews will be skipped"
+            ((WARNINGS++))
+          else
+            echo "✓ SOURCERY_TOKEN is set"
+          fi
+
+          echo ""
+          if [[ $WARNINGS -gt 0 ]]; then
+            echo "Setup completed with $WARNINGS warnings"
+            echo "See: https://github.com/${{ github.repository }}/settings/secrets/actions"
+          else
+            echo "All secrets configured!"
+          fi
+          echo "============================================"
+
+      - name: Summary
+        run: |
+          echo ""
+          echo "============================================"
+          echo "SETUP COMPLETE"
+          echo "============================================"
+          echo ""
+          echo "Repository is ready for development."
+          echo ""
+          echo "Quick links:"
+          echo "  - Actions settings: https://github.com/${{ github.repository }}/settings/actions"
+          echo "  - Secrets: https://github.com/${{ github.repository }}/settings/secrets/actions"
+          echo "  - Branch protection: https://github.com/${{ github.repository }}/settings/branches"
+          echo ""
+          echo "This check runs automatically on the first 5 pushes to main."
+          echo "You can also run it manually from the Actions tab."
+          echo "============================================"

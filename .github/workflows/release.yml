@@ -1,0 +1,37 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run release-please
+        id: release
+        uses: googleapis/release-please-action@v4
+        with:
+          release-type: python
+
+      - name: Check for permission errors
+        if: failure()
+        run: |
+          echo ""
+          echo "============================================"
+          echo "RELEASE-PLEASE FAILED"
+          echo "============================================"
+          echo ""
+          echo "If the error mentions 'not permitted to create or approve pull requests':"
+          echo ""
+          echo "FIX: Go to repository Settings → Actions → General"
+          echo "     Under 'Workflow permissions', enable:"
+          echo "     ✓ 'Allow GitHub Actions to create and approve pull requests'"
+          echo ""
+          echo "Settings URL: https://github.com/${{ github.repository }}/settings/actions"
+          echo "============================================"
+          exit 1
