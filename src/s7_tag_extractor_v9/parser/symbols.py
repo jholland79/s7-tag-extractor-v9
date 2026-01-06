@@ -3,10 +3,7 @@
 from pathlib import Path
 
 from s7_tag_extractor_v9.models import Symbol
-from s7_tag_extractor_v9.parser.dbf_constants import (
-    DELETED_RECORD_MARKER,
-    parse_dbf_header,
-)
+from s7_tag_extractor_v9.parser.dbf_constants import iter_dbf_records
 
 # DBF record field positions and widths
 NAME_FIELD_START = 1
@@ -33,18 +30,7 @@ def parse_symbols(symlist_path: Path) -> list[Symbol]:
     symbols = []
 
     with open(symlist_path, "rb") as f:
-        dbf_header = parse_dbf_header(f)
-        f.seek(dbf_header.header_length)
-
-        for _ in range(dbf_header.num_records):
-            record_data = f.read(dbf_header.record_length)
-            if len(record_data) < dbf_header.record_length:
-                break
-
-            delete_marker = record_data[0]
-            if delete_marker == DELETED_RECORD_MARKER:
-                continue
-
+        for record_data in iter_dbf_records(f):
             name = _extract_field(record_data, NAME_FIELD_START, NAME_FIELD_WIDTH)
             address = _extract_field(
                 record_data, ADDRESS_FIELD_START, ADDRESS_FIELD_WIDTH

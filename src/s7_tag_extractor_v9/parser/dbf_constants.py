@@ -48,3 +48,27 @@ def parse_dbf_header(f: BinaryIO) -> DBFHeader:
         header_length=header_length,
         record_length=record_length,
     )
+
+
+def iter_dbf_records(f: BinaryIO):
+    """Iterate over non-deleted records in a DBF file.
+
+    Args:
+        f: Open file handle positioned at the start of the file
+
+    Yields:
+        bytes: Raw record data for each non-deleted record
+    """
+    dbf_header = parse_dbf_header(f)
+    f.seek(dbf_header.header_length)
+
+    for _ in range(dbf_header.num_records):
+        record_data = f.read(dbf_header.record_length)
+        if len(record_data) < dbf_header.record_length:
+            break
+
+        delete_marker = record_data[0]
+        if delete_marker == DELETED_RECORD_MARKER:
+            continue
+
+        yield record_data

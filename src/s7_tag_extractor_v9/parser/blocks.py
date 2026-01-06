@@ -4,10 +4,7 @@ import struct
 from pathlib import Path
 
 from s7_tag_extractor_v9.models import DataBlock
-from s7_tag_extractor_v9.parser.dbf_constants import (
-    DELETED_RECORD_MARKER,
-    parse_dbf_header,
-)
+from s7_tag_extractor_v9.parser.dbf_constants import iter_dbf_records
 
 # Block number field position (after delete marker)
 BLOCK_NUMBER_FIELD_START = 1
@@ -26,18 +23,7 @@ def parse_blocks(baustein_path: Path) -> list[DataBlock]:
     blocks = []
 
     with open(baustein_path, "rb") as f:
-        dbf_header = parse_dbf_header(f)
-        f.seek(dbf_header.header_length)
-
-        for _ in range(dbf_header.num_records):
-            record_data = f.read(dbf_header.record_length)
-            if len(record_data) < dbf_header.record_length:
-                break
-
-            delete_marker = record_data[0]
-            if delete_marker == DELETED_RECORD_MARKER:
-                continue
-
+        for record_data in iter_dbf_records(f):
             block_number_end = BLOCK_NUMBER_FIELD_START + BLOCK_NUMBER_FIELD_SIZE
             block_number_bytes = record_data[BLOCK_NUMBER_FIELD_START:block_number_end]
             block_number = struct.unpack("<H", block_number_bytes)[0]
