@@ -15,17 +15,15 @@ ignore:
   - build
   - "*.egg-info"
 
-refactor:
+rule_settings:
+  enable:
+    - default
+    - no-long-functions
   python_version: '3.14'
   rule_types:
     - refactoring
     - suggestion
     - comment
-
-rule_settings:
-  enable:
-    - default
-    - no-long-functions  # Flag functions > 50 lines
 
 github:
   request_changes_threshold: 5
