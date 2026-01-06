@@ -1,15 +1,11 @@
 """Symbol table parsing from SYMLIST.DBF files."""
 
-import struct
 from pathlib import Path
 
 from s7_tag_extractor_v9.models import Symbol
 from s7_tag_extractor_v9.parser.dbf_constants import (
-    DBF_HEADER_SIZE,
     DELETED_RECORD_MARKER,
-    HEADER_LENGTH_OFFSET,
-    NUM_RECORDS_OFFSET,
-    RECORD_LENGTH_OFFSET,
+    parse_dbf_header,
 )
 
 # DBF record field positions and widths
@@ -37,22 +33,12 @@ def parse_symbols(symlist_path: Path) -> list[Symbol]:
     symbols = []
 
     with open(symlist_path, "rb") as f:
-        header = f.read(DBF_HEADER_SIZE)
+        dbf_header = parse_dbf_header(f)
+        f.seek(dbf_header.header_length)
 
-        num_records_slice = header[NUM_RECORDS_OFFSET : NUM_RECORDS_OFFSET + 4]
-        num_records = struct.unpack("<I", num_records_slice)[0]
-
-        header_len_slice = header[HEADER_LENGTH_OFFSET : HEADER_LENGTH_OFFSET + 2]
-        header_length = struct.unpack("<H", header_len_slice)[0]
-
-        record_len_slice = header[RECORD_LENGTH_OFFSET : RECORD_LENGTH_OFFSET + 2]
-        record_length = struct.unpack("<H", record_len_slice)[0]
-
-        f.seek(header_length)
-
-        for _ in range(num_records):
-            record_data = f.read(record_length)
-            if len(record_data) < record_length:
+        for _ in range(dbf_header.num_records):
+            record_data = f.read(dbf_header.record_length)
+            if len(record_data) < dbf_header.record_length:
                 break
 
             delete_marker = record_data[0]
