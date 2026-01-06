@@ -39,8 +39,8 @@ def export(project: str, export_format: str, output: str) -> None:
         all_symbols.extend(symbols)
 
     # Export based on format
-    if export_format == FORMAT_PI_BUILDER:
-        with open(output_path, "wb") as f:
-            export_to_pi_builder(all_symbols, f)
-    else:
+    if export_format != FORMAT_PI_BUILDER:
         raise click.BadParameter(f"Unknown format: {export_format}")
+
+    with open(output_path, "wb") as f:
+        export_to_pi_builder(all_symbols, f)

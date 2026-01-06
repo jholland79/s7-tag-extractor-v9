@@ -21,7 +21,7 @@ def test_sample_project_has_symlist_dbf(sample_project_path: Path) -> None:
     # Find any SYMLIST.DBF file in the sample project (may be in subdirectory)
     symlist_files = list(sample_project_path.rglob("SYMLIST.DBF"))
 
-    assert len(symlist_files) > 0, (
+    assert symlist_files, (
         f"Expected SYMLIST.DBF in {sample_project_path}, but none found. "
         "Download sample project from: "
         "https://github.com/SCADACS/snap7/tree/master/examples/Step%207/Snap7"
