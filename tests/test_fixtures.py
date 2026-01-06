@@ -16,15 +16,13 @@ def test_package_version_is_defined() -> None:
     assert len(parts) == 3, f"Expected semver format, got: {__version__}"
 
 
-def test_sample_project_has_symlist_dbf() -> None:
+def test_sample_project_has_symlist_dbf(sample_project_path: Path) -> None:
     """Sample Step 7 project contains SYMLIST.DBF for symbol table testing."""
-    fixtures_dir = Path(__file__).parent / "fixtures" / "sample_project"
-
     # Find any SYMLIST.DBF file in the sample project (may be in subdirectory)
-    symlist_files = list(fixtures_dir.rglob("SYMLIST.DBF"))
+    symlist_files = list(sample_project_path.rglob("SYMLIST.DBF"))
 
     assert len(symlist_files) > 0, (
-        f"Expected SYMLIST.DBF in {fixtures_dir}, but none found. "
+        f"Expected SYMLIST.DBF in {sample_project_path}, but none found. "
         "Download sample project from: "
         "https://github.com/SCADACS/snap7/tree/master/examples/Step%207/Snap7"
     )
