@@ -4,21 +4,19 @@ import struct
 from pathlib import Path
 
 from s7_tag_extractor_v9.models import Symbol
-
-# DBF header structure offsets
-DBF_HEADER_SIZE = 32
-NUM_RECORDS_OFFSET = 4
-HEADER_LENGTH_OFFSET = 8
-RECORD_LENGTH_OFFSET = 10
+from s7_tag_extractor_v9.parser.dbf_constants import (
+    DBF_HEADER_SIZE,
+    DELETED_RECORD_MARKER,
+    HEADER_LENGTH_OFFSET,
+    NUM_RECORDS_OFFSET,
+    RECORD_LENGTH_OFFSET,
+)
 
 # DBF record field positions and widths
 NAME_FIELD_START = 1
 NAME_FIELD_WIDTH = 20
 ADDRESS_FIELD_START = 21
 ADDRESS_FIELD_WIDTH = 20
-
-# Delete marker
-DELETED_RECORD_MARKER = ord("*")
 
 
 def _extract_field(record_data: bytes, start: int, width: int) -> str:

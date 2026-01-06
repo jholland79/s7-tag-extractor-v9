@@ -4,15 +4,13 @@ import struct
 from pathlib import Path
 
 from s7_tag_extractor_v9.models import DataBlock
-
-# DBF header structure offsets
-DBF_HEADER_SIZE = 32
-NUM_RECORDS_OFFSET = 4
-HEADER_LENGTH_OFFSET = 8
-RECORD_LENGTH_OFFSET = 10
-
-# Delete marker
-DELETED_RECORD_MARKER = ord("*")
+from s7_tag_extractor_v9.parser.dbf_constants import (
+    DBF_HEADER_SIZE,
+    DELETED_RECORD_MARKER,
+    HEADER_LENGTH_OFFSET,
+    NUM_RECORDS_OFFSET,
+    RECORD_LENGTH_OFFSET,
+)
 
 
 def parse_blocks(baustein_path: Path) -> list[DataBlock]:
