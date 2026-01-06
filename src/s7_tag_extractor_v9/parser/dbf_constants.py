@@ -14,6 +14,12 @@ RECORD_LENGTH_OFFSET = 10
 DELETED_RECORD_MARKER = ord("*")
 
 
+def _unpack_field(data: bytes, offset: int, fmt: str) -> int:
+    """Unpack a single field from binary data at the given offset."""
+    size = struct.calcsize(fmt)
+    return struct.unpack(fmt, data[offset : offset + size])[0]
+
+
 @dataclass
 class DBFHeader:
     """Parsed DBF file header information."""
@@ -34,14 +40,9 @@ def parse_dbf_header(f: BinaryIO) -> DBFHeader:
     """
     header = f.read(DBF_HEADER_SIZE)
 
-    num_records_slice = header[NUM_RECORDS_OFFSET : NUM_RECORDS_OFFSET + 4]
-    num_records = struct.unpack("<I", num_records_slice)[0]
-
-    header_len_slice = header[HEADER_LENGTH_OFFSET : HEADER_LENGTH_OFFSET + 2]
-    header_length = struct.unpack("<H", header_len_slice)[0]
-
-    record_len_slice = header[RECORD_LENGTH_OFFSET : RECORD_LENGTH_OFFSET + 2]
-    record_length = struct.unpack("<H", record_len_slice)[0]
+    num_records = _unpack_field(header, NUM_RECORDS_OFFSET, "<I")
+    header_length = _unpack_field(header, HEADER_LENGTH_OFFSET, "<H")
+    record_length = _unpack_field(header, RECORD_LENGTH_OFFSET, "<H")
 
     return DBFHeader(
         num_records=num_records,
