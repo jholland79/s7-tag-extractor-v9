@@ -11,3 +11,11 @@ class Symbol:
     address: str
     data_type: str
     comment: str | None = None
+
+
+@dataclass
+class DataBlock:
+    """DataBlock dataclass with block number and elements."""
+
+    number: int
+    elements: list
