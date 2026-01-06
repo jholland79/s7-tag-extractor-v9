@@ -3,8 +3,8 @@
 from io import BytesIO
 
 from openpyxl import load_workbook
-from s7_tag_extractor_v9.exporters.pi_builder import export_to_pi_builder
 
+from s7_tag_extractor_v9.exporters.pi_builder import export_to_pi_builder
 from s7_tag_extractor_v9.models import Symbol
 
 PI_BUILDER_COLUMNS = [

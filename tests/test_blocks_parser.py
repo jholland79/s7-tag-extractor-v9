@@ -2,9 +2,8 @@
 
 from pathlib import Path
 
-from s7_tag_extractor_v9.parser.blocks import parse_blocks
-
 from s7_tag_extractor_v9.models import DataBlock
+from s7_tag_extractor_v9.parser.blocks import parse_blocks
 
 
 def test_parse_blocks_extracts_data_block_with_number_and_elements(

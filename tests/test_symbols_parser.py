@@ -2,9 +2,8 @@
 
 from pathlib import Path
 
-from s7_tag_extractor_v9.parser.symbols import parse_symbols
-
 from s7_tag_extractor_v9.models import Symbol
+from s7_tag_extractor_v9.parser.symbols import parse_symbols
 
 
 def test_parse_symbols_extracts_symbol_with_name_address_comment(

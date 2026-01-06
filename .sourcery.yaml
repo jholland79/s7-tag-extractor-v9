@@ -1,6 +1,4 @@
 # Sourcery configuration
-# https://docs.sourcery.ai/Reference/Configuration/sourcery-yaml/
-
 version: '1'
 
 ignore:
@@ -24,7 +22,3 @@ rule_settings:
     - refactoring
     - suggestion
     - comment
-
-github:
-  request_changes_threshold: 5
-  inline_comments: true

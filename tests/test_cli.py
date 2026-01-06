@@ -3,6 +3,7 @@
 from pathlib import Path
 
 from click.testing import CliRunner
+
 from s7_tag_extractor_v9.cli import cli
 
 
