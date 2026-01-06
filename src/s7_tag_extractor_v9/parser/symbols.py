@@ -21,6 +21,12 @@ ADDRESS_FIELD_WIDTH = 20
 DELETED_RECORD_MARKER = ord("*")
 
 
+def _extract_field(record_data: bytes, start: int, width: int) -> str:
+    """Extract and decode a fixed-width field from a DBF record."""
+    field_bytes = record_data[start : start + width]
+    return field_bytes.decode("ascii", errors="ignore").strip()
+
+
 def parse_symbols(symlist_path: Path) -> list[Symbol]:
     """Parse symbols from a SYMLIST.DBF file.
 
@@ -55,13 +61,10 @@ def parse_symbols(symlist_path: Path) -> list[Symbol]:
             if delete_marker == DELETED_RECORD_MARKER:
                 continue
 
-            name_end = NAME_FIELD_START + NAME_FIELD_WIDTH
-            name_bytes = record_data[NAME_FIELD_START:name_end]
-            name = name_bytes.decode("ascii", errors="ignore").strip()
-
-            address_end = ADDRESS_FIELD_START + ADDRESS_FIELD_WIDTH
-            address_bytes = record_data[ADDRESS_FIELD_START:address_end]
-            address = address_bytes.decode("ascii", errors="ignore").strip()
+            name = _extract_field(record_data, NAME_FIELD_START, NAME_FIELD_WIDTH)
+            address = _extract_field(
+                record_data, ADDRESS_FIELD_START, ADDRESS_FIELD_WIDTH
+            )
 
             if name and address:
                 symbol = Symbol(name=name, address=address, data_type="", comment=None)
