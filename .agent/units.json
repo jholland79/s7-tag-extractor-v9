@@ -1,0 +1,104 @@
+{
+  "units": [
+    {
+      "id": "1.1",
+      "name": "download-sample-step-7-project",
+      "description": "Download sample Step 7 project",
+      "files": {
+        "src": "tests/fixtures/sample_project/",
+        "test": "tests/test_fixtures.py"
+      },
+      "acceptance": "Sample S7 project from snap7 repo is available with SYMLIST.DBF"
+    },
+    {
+      "id": "1.2",
+      "name": "implement-data-models",
+      "description": "Implement data models",
+      "files": {
+        "src": "src/s7_tag_extractor/models.py",
+        "test": "tests/test_models.py"
+      },
+      "acceptance": "Tag, Symbol, DataBlock dataclasses with validation"
+    },
+    {
+      "id": "2.1",
+      "name": "project-structure-navigation",
+      "description": "Project structure navigation",
+      "files": {
+        "src": "src/s7_tag_extractor/parser/project.py",
+        "test": "tests/test_project_parser.py"
+      },
+      "acceptance": "Given .s7p path, find all SYMLIST.DBF, BAUSTEIN.DBF files"
+    },
+    {
+      "id": "2.2",
+      "name": "symbol-table-parsing-symlist-dbf",
+      "description": "Symbol table parsing (SYMLIST.DBF)",
+      "files": {
+        "src": "src/s7_tag_extractor/parser/symbols.py",
+        "test": "tests/test_symbols_parser.py"
+      },
+      "acceptance": "Extract _SKZ (name),_OPHIST (address), _COMMENT from SYMLIST.DBF"
+    },
+    {
+      "id": "2.3",
+      "name": "data-block-parsing-baustein-dbf",
+      "description": "Data block parsing (BAUSTEIN.DBF)",
+      "files": {
+        "src": "src/s7_tag_extractor/parser/blocks.py",
+        "test": "tests/test_blocks_parser.py"
+      },
+      "acceptance": "Parse DB definitions, detect arrays, extract element types"
+    },
+    {
+      "id": "3.1",
+      "name": "array-detection-and-expansion",
+      "description": "Array detection and expansion",
+      "files": {
+        "src": "src/s7_tag_extractor/parser/arrays.py",
+        "test": "tests/test_array_expansion.py"
+      },
+      "acceptance": "Array[0..9] of INT → 10 individual tags with correct addresses"
+    },
+    {
+      "id": "4.1",
+      "name": "s7-to-pi-type-mapping",
+      "description": "S7 to PI type mapping",
+      "files": {
+        "src": "src/s7_tag_extractor/exporters/type_mapping.py",
+        "test": "tests/test_type_mapping.py"
+      },
+      "acceptance": "BOOL→Int16+Location2=2, INT→Int16, REAL→Float32, etc."
+    },
+    {
+      "id": "4.2",
+      "name": "excel-export-with-pi-builder-columns",
+      "description": "Excel export with PI Builder columns",
+      "files": {
+        "src": "src/s7_tag_extractor/exporters/pi_builder.py",
+        "test": "tests/test_pi_builder_export.py"
+      },
+      "acceptance": "Excel with Tag, PointType, PointSource, Descriptor, InstrumentTag, Location2"
+    },
+    {
+      "id": "5.1",
+      "name": "cli-with-click",
+      "description": "CLI with Click",
+      "files": {
+        "src": "src/s7_tag_extractor/cli.py",
+        "test": "tests/test_cli.py"
+      },
+      "acceptance": "`s7-tag-extractor export <project.s7p> --format pi-builder -o out.xlsx`"
+    },
+    {
+      "id": "6.1",
+      "name": "kepware-csv-export",
+      "description": "Kepware CSV export",
+      "files": {
+        "src": "src/s7_tag_extractor/exporters/kepware.py",
+        "test": "tests/test_kepware_export.py"
+      },
+      "acceptance": "CSV with Kepware Siemens driver compatible columns"
+    }
+  ]
+}
