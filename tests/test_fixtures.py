@@ -6,6 +6,15 @@ is available and contains the required DBF files for testing.
 
 from pathlib import Path
 
+from s7_tag_extractor_v9 import __version__
+
+
+def test_package_version_is_defined() -> None:
+    """Package has a valid semantic version string."""
+    assert __version__
+    parts = __version__.split(".")
+    assert len(parts) == 3, f"Expected semver format, got: {__version__}"
+
 
 def test_sample_project_has_symlist_dbf() -> None:
     """Sample Step 7 project contains SYMLIST.DBF for symbol table testing."""
