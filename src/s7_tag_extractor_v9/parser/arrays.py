@@ -32,10 +32,10 @@ def expand_array(
     elements = []
 
     for i in range(start_index, end_index + 1):
-        element_address = base_address + (i - start_index) * element_size
+        element_offset = base_address + (i - start_index) * element_size
         element = Symbol(
             name=f"{name}[{i}]",
-            address=element_address,
+            address=str(element_offset),
             data_type=element_type,
         )
         elements.append(element)

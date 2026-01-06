@@ -21,7 +21,7 @@ def test_expand_array_int_array_0_to_9_returns_10_tags_with_correct_addresses() 
 
     assert len(result) == 10
     assert result[0].name == "Temperatures[0]"
-    assert result[0].address == 0
+    assert result[0].address == "0"
     assert result[0].data_type == "INT"
     assert result[9].name == "Temperatures[9]"
-    assert result[9].address == 18  # INT is 2 bytes, so index 9 is at offset 18
+    assert result[9].address == "18"  # INT is 2 bytes, so index 9 is at offset 18
