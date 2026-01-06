@@ -3,19 +3,8 @@
 import csv
 from io import StringIO
 
-from s7_tag_extractor_v9.exporters.kepware import export_to_kepware
-
+from s7_tag_extractor_v9.exporters.kepware import KEPWARE_COLUMNS, export_to_kepware
 from s7_tag_extractor_v9.models import Symbol
-
-KEPWARE_COLUMNS = [
-    "Tag Name",
-    "Address",
-    "Data Type",
-    "Respect Data Type",
-    "Client Access",
-    "Scan Rate",
-    "Description",
-]
 
 
 def test_export_creates_csv_with_kepware_columns() -> None:
