@@ -1,5 +1,13 @@
 """Array detection and expansion for S7 data blocks."""
 
+from s7_tag_extractor_v9.models import Symbol
+
+# Data type sizes in bytes
+TYPE_SIZES = {
+    "INT": 2,
+    "REAL": 4,
+}
+
 
 def expand_array(
     name: str,
@@ -20,4 +28,16 @@ def expand_array(
     Returns:
         List of expanded element tags
     """
-    raise NotImplementedError()
+    element_size = TYPE_SIZES[element_type]
+    elements = []
+
+    for i in range(start_index, end_index + 1):
+        element_address = base_address + (i - start_index) * element_size
+        element = Symbol(
+            name=f"{name}[{i}]",
+            address=element_address,
+            data_type=element_type,
+        )
+        elements.append(element)
+
+    return elements
