@@ -9,6 +9,10 @@ from s7_tag_extractor_v9.parser.dbf_constants import (
     parse_dbf_header,
 )
 
+# Block number field position (after delete marker)
+BLOCK_NUMBER_FIELD_START = 1
+BLOCK_NUMBER_FIELD_SIZE = 2
+
 
 def parse_blocks(baustein_path: Path) -> list[DataBlock]:
     """Parse data blocks from a BAUSTEIN.DBF file.
@@ -34,8 +38,9 @@ def parse_blocks(baustein_path: Path) -> list[DataBlock]:
             if delete_marker == DELETED_RECORD_MARKER:
                 continue
 
-            # Extract block number from first field (2 bytes, little-endian)
-            block_number = struct.unpack("<H", record_data[1:3])[0]
+            block_number_end = BLOCK_NUMBER_FIELD_START + BLOCK_NUMBER_FIELD_SIZE
+            block_number_bytes = record_data[BLOCK_NUMBER_FIELD_START:block_number_end]
+            block_number = struct.unpack("<H", block_number_bytes)[0]
 
             block = DataBlock(number=block_number, elements=[])
             blocks.append(block)
